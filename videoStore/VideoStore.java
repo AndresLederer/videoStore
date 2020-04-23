@@ -1,13 +1,17 @@
 package videoStore;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
+//import java.io.*;
 
 public class VideoStore {
 	private static ArrayList <Pelicula> libreriaPeliculas;
 	private static ArrayList <Cliente> agendaClientes ;
 	private static ArrayList <BoletaPrestamo> boletasPrestamo;
-	private static Scanner scn = new Scanner(System.in);;
+	private static Scanner scn;// = new Scanner(System.in);
 	
+	private static Date actualDate = new Date();
+	private static SimpleDateFormat formatoPers = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public static void main(String [] args) {
 		//instancio Peliculas
@@ -26,7 +30,7 @@ public class VideoStore {
 		//instancio Clientes
 		Cliente c1 = new Cliente("Jael Stainer","+20 112 457852","Ganzngen Street 17");
 		Cliente c2 = new Cliente("Anais Stainer","+20 112 159753","Larrea Street 230");
-		Cliente c3 = new Cliente("SeHee Young","+54 223 5395183","Whiteladies Road 24");
+		Cliente c3 = new Cliente("Tim Young","+54 223 5395183","Whiteladies Road 24");
 		Cliente c4 = new Cliente("Louisa Ximenez","+32 20 6147455","Pembrook Street 90");
 		//instancio agenda de clientes
 		agendaClientes = new ArrayList <Cliente>();
@@ -39,12 +43,49 @@ public class VideoStore {
 		//instancio arraylist de boletas
 		boletasPrestamo = new ArrayList <BoletaPrestamo>();
 		
+		//menu principal del programa
 		mainMenu();
 		
-		verAlquileresVigentes();
 	}
 	
-	//OTROS METODOS ------------------------------------------------------------------------------------------------------------------------------------
+	// METODOS ------------------------------------------------------------------------------------------------------------------------------------
+	
+	//mainMenu
+	private static void mainMenu() {
+		scn = new Scanner(System.in);
+		int opcion;
+		do {
+			do {
+//				clearConsole();
+				System.out.println(formatoPers.format(actualDate));
+				System.out.println("<<< VIDEO STORE >>>\n\n");
+				System.out.println("[1] Alquilar pelicula");
+				System.out.println("[2] Devoluciones del día");
+				System.out.println("[3] Alquileres vigentes");
+				System.out.println("[0] Salir");
+				System.out.printf("\n\nIndique una opción: "); 
+				opcion = scn.nextInt();
+			} while(opcion < 0 || opcion > 3);
+			switch(opcion) {
+			case 0:
+				System.out.println("Ha finalizado la ejecución");
+//				System.exit(0);
+				break;
+			case 1:
+				if(alquilarPelicula()) 
+					System.out.println("Pelicula alquilada");
+				else
+					System.out.println("Pelicula no alquilada");
+				break;
+			case 2:
+				verDevolucionesDelDia();
+				break;
+			case 3:
+				verAlquileresVigentes();
+				break;
+			}
+		} while(opcion != 0);
+	}
 	
 //	//corrobora que una pelicula este en la libreriaPeliculas
 //	private static boolean buscarPelicula(Pelicula peliculaBuscada) {
@@ -88,14 +129,25 @@ public class VideoStore {
 	
 	//muestra por cmd las boletas de los alquileres vigentes
 	private static void verAlquileresVigentes() {
+		System.out.println("\n[ALQUILERES VIGENTES]");
+		int alquileresVigentes = 0;
 		for(BoletaPrestamo b : boletasPrestamo) {
-			System.out.println(b.toString());
+			if(b.getFechaDevolucion().after(actualDate) || b.getFechaDevolucion().equals(actualDate)) {
+				System.out.println("--------------------------------------");
+				System.out.println(b.toString());
+				System.out.println("--------------------------------------");
+				alquileresVigentes++;
+			}
 		}
+		System.out.println("\nALQUILERES VIGENTES TOTALES: "+alquileresVigentes+"\n");
 	}
 
 	//inicia aqluiler de pelicula
-	private static void alquilarPelicula() {
+	private static boolean alquilarPelicula() {
+		boolean peliculaAlquilada; //check de que efectivamente se haya alquilado la pelicula
+		
 		System.out.printf("Indique el titulo de la pelicula: "); //recibo el titulo de la pelicula que se quiere alquilar
+		scn = new Scanner(System.in);
 		String tituloBuscado = scn.nextLine(); 
 		
 		//corroboro q sea una pelicula existente en mi libreria de peliculas
@@ -103,6 +155,9 @@ public class VideoStore {
 			System.out.println("La pelicula buscada existe en el VideoStore");
 			//la pelicula existe en mi libreria, me fijo que haya alguna disponible para alquilar
 			if(checkCopiasDisponibles(capitalizeEachWord(tituloBuscado))) { 
+				peliculaAlquilada = true; //la pelicula se va a alquilar
+				//reduzco en 1 la cantidad de peliculas disponibles para dicho titulo
+				reduceCantDisponible(capitalizeEachWord(tituloBuscado));
 				System.out.println("Hay copias disponibles para ser alquiladas");
 				//la pelicula esta disponible para se alquilada -- procedo a identificar al cliente
 				System.out.printf("Nombre y apellido del cliente: ");
@@ -122,14 +177,25 @@ public class VideoStore {
 				}
 			//la pelicula existe en mi libreria  pero no tengo ninguna para alquilar -- vuelva mas tarde :/
 			}else {
+				peliculaAlquilada = false; 
 				System.out.println("En este momento no hay copias disponibles para ser alquiladas");
 			}
 		}else { //la pelicula no existe en mi libreria -- vaya a otra tienda :(
+			peliculaAlquilada = false;
 			System.out.println("La pelicula buscada no existe en el VideoStore");
 		}
-
+		
+		return peliculaAlquilada;
 	}
 	
+	private static void reduceCantDisponible(String peliculaAlquilada) {
+		for(Pelicula p: libreriaPeliculas) {
+			if(p.getTitulo().equals(peliculaAlquilada))
+				p.setCopiasDisponibles(p.getCopiasDisponibles()-1);
+		}
+	}
+	
+	//recibe datos de un cliente por Scanner y devuelve un Cliente nuevo
 	private static Cliente creaClienteNuevo() {
 		System.out.println("NUEVO CLIENTE");
 		System.out.printf("Nombre y apellid: ");
@@ -142,35 +208,29 @@ public class VideoStore {
 		return clienteNuevo;
 	}
 	
+	//recibe por parametros datos y devuelve una BoletaPrestamo nueva
 	private static BoletaPrestamo creaBoletaNueva(String peliculaAlquilada,String nombreCliente) {
 		BoletaPrestamo nuevaBoleta = new BoletaPrestamo(peliculaAlquilada,nombreCliente);
 		return nuevaBoleta;
 	}
 	
+	//muestra por cmd las devoluciones del dia actual
+	private static void verDevolucionesDelDia() {
+		System.out.println("\n[DEVOLUCIONES DEL DIA]");
+		int devoluciones = 0;
+		for(BoletaPrestamo bp : boletasPrestamo) {
+			if(bp.getFechaDevolucion().equals(actualDate)) {
+				System.out.println("--------------------------------------");
+				System.out.println(bp.toString());
+				System.out.println("--------------------------------------");
+				devoluciones++;
+			}
+		}
+		System.out.println("DEVOLUCIONES TOTALES DEL DIA: "+devoluciones);
+	}
 	
 	//OTROS MEOTODOS AUXILIARES ---------------------------------------------------------------------------------------------------------------------------
 	
-	//mainMenu
-	private static void mainMenu() {
-		int opcion;
-		do {
-			System.out.println("<<< VIDEO STORE >>>\n\n");
-			System.out.println("[1] Alquilar pelicula");
-			System.out.println("[0] Salir");
-			System.out.printf("\n\nIndique una opción: "); 
-			opcion = scn.nextInt();
-		} while(opcion != 0 || opcion < 0 || opcion > 1);
-		switch(opcion) {
-			case 0:
-				System.out.println("Ha finalizado la ejecución");
-			break;
-			case 1:
-				alquilarPelicula();
-			break;
-			
-		}
-//		System.exit(0);
-	}
 	
 	//recibe un string y lo devuelve con la primera letra de cada palabra en mayuscula
 	private static String capitalizeEachWord(String string) {
@@ -184,4 +244,17 @@ public class VideoStore {
 		string = String.join(" ",palabras);
 		return string;
 	}
+	
+//	//limpiar cmd
+//	public final static void clearConsole(){
+//	    try{
+//	        final String os = System.getProperty("os.name");
+//	        if (os.contains("Windows"))
+//	            Runtime.getRuntime().exec("cls");
+//	        else
+//	            Runtime.getRuntime().exec("clear");
+//	    }catch (final Exception e){
+//	    	System.out.println("catch Exception e");
+//	    }
+//	}
 }

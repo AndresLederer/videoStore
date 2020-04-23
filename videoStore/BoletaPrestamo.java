@@ -34,12 +34,12 @@ public class BoletaPrestamo {
 	public String getNombreCliente() {
 		return nombreCliente;
 	}
-//	public Date getFechaAlquiler() {
-//		return fechaAlquiler;
-//	}
-//	public Date getFechaDevolucion() {
-//		return fechaDevolucion;
-//	}
+	public Date getFechaAlquiler() {
+		return fechaAlquiler;
+	}
+	public Date getFechaDevolucion() {
+		return fechaDevolucion;
+	}
 	
 	//Constructor
 	public BoletaPrestamo(String nombrePelicula,String nombreCliente) {
@@ -59,7 +59,7 @@ public class BoletaPrestamo {
 	//@Override de .toString()
 	@Override
 	public String toString() {
-		String rta = String.format("Pelicula alquilada: %s\nAlquilada a: %s\nFecha de alquiler: %s\nFecha de devolución: %s",getNombrePelicula(),getNombreCliente(),fechaPers.format(fechaAlquiler),fechaPers.format(fechaDevolucion));
+		String rta = String.format("Pelicula alquilada: %s\nAlquilada a: %s\nFecha de alquiler: %s\nFecha de devolución: %s",getNombrePelicula(),getNombreCliente(),fechaPers.format(getFechaAlquiler()),fechaPers.format(getFechaDevolucion()));
 		return rta;
 	}
 	
