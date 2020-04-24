@@ -5,14 +5,15 @@ import java.util.*;
 //import java.io.*;
 
 public class VideoStore {
+	//atributos
 	private static ArrayList <Pelicula> libreriaPeliculas;
 	private static ArrayList <Cliente> agendaClientes ;
 	private static ArrayList <BoletaPrestamo> boletasPrestamo;
 	private static Scanner scn;// = new Scanner(System.in);
-	
 	private static Date actualDate = new Date();
 	private static SimpleDateFormat formatoPers = new SimpleDateFormat("dd/MM/yyyy");
 	
+	//metodos main
 	public static void main(String [] args) {
 		//instancio Peliculas
 		Pelicula p1 = new Pelicula("Titanic",130,"Drama",1998,"Estados Unidos","Basada en hechos reales. El undimiento del Titanic.","G",5,5);
@@ -28,10 +29,10 @@ public class VideoStore {
 		libreriaPeliculas.add(p4);
 		
 		//instancio Clientes
-		Cliente c1 = new Cliente("Jael Stainer","+20 112 457852","Ganzngen Street 17");
-		Cliente c2 = new Cliente("Anais Stainer","+20 112 159753","Larrea Street 230");
-		Cliente c3 = new Cliente("Tim Young","+54 223 5395183","Whiteladies Road 24");
-		Cliente c4 = new Cliente("Louisa Ximenez","+32 20 6147455","Pembrook Street 90");
+		Cliente c1 = new Cliente("Jael Stainer","+20 112 457852","Ganzngen Street 17",0);
+		Cliente c2 = new Cliente("Anais Stainer","+20 112 159753","Larrea Street 230",0);
+		Cliente c3 = new Cliente("Tim Young","+54 223 5395183","Whiteladies Road 24",0);
+		Cliente c4 = new Cliente("Louisa Ximenez","+32 20 6147455","Pembrook Street 90",0);
 		//instancio agenda de clientes
 		agendaClientes = new ArrayList <Cliente>();
 		//cargo clientes a la agenda
@@ -44,14 +45,20 @@ public class VideoStore {
 		boletasPrestamo = new ArrayList <BoletaPrestamo>();
 		
 		//menu principal del programa
-		mainMenu();
+		try {
+			mainMenu();
+		}catch(InputMismatchException ex) {
+			System.out.println(">>> DEBE INGRESAR UN NUMERO ENTERO <<<");
+			mainMenu();
+		}
+		
 		
 	}
 	
 	// METODOS ------------------------------------------------------------------------------------------------------------------------------------
 	
-	//mainMenu
-	private static void mainMenu() {
+	//mainMenu -- concidero una InputMismatchException si se ingresa un String en lungar de un int
+	private static void mainMenu() throws InputMismatchException {
 		scn = new Scanner(System.in);
 		int opcion;
 		do {
@@ -62,14 +69,15 @@ public class VideoStore {
 				System.out.println("[1] Alquilar pelicula");
 				System.out.println("[2] Devoluciones del día");
 				System.out.println("[3] Alquileres vigentes");
+				System.out.println("[4] Ultimos 3 alquileres por cliente");
 				System.out.println("[0] Salir");
 				System.out.printf("\n\nIndique una opción: "); 
 				opcion = scn.nextInt();
-			} while(opcion < 0 || opcion > 3);
+			} while(opcion < 0 || opcion > 4);
 			switch(opcion) {
 			case 0:
 				System.out.println("Ha finalizado la ejecución");
-//				System.exit(0);
+				System.exit(0);
 				break;
 			case 1:
 				if(alquilarPelicula()) 
@@ -82,6 +90,13 @@ public class VideoStore {
 				break;
 			case 3:
 				verAlquileresVigentes();
+				break;
+			case 4:
+				scn = new Scanner(System.in);
+				System.out.printf("Indique el nombre completo del cliente: ");
+//				scn.nextLine(); //acomoda cursor del Scanner
+				String cliente = scn.nextLine();
+				verUltimosAlquileresPorCliente(capitalizeEachWord(cliente));
 				break;
 			}
 		} while(opcion != 0);
@@ -165,11 +180,16 @@ public class VideoStore {
 				//chequedo si es un cliente regular
 				if(checkClienteExistente(capitalizeEachWord(nombreCliente))) { 
 					//es un cliente regular => le hago su boleta y la agrego al AList de Boletas de Prestamos
+					for(Cliente c : agendaClientes) {
+						if(c.getNombre().equals(capitalizeEachWord(nombreCliente)))
+								c.setCantAlquileres(c.getCantAlquileres()+1);
+					}
 					BoletaPrestamo boletaNueva = creaBoletaNueva(capitalizeEachWord(tituloBuscado),capitalizeEachWord(nombreCliente));
 					boletasPrestamo.add(boletaNueva);
 				}else { //si se trata de un clienten nuevo
 					//creo cliente nuevo y lo agrego a la agenda de clientes
 					Cliente clienteNuevo = creaClienteNuevo();
+					clienteNuevo.setCantAlquileres(clienteNuevo.getCantAlquileres()+1);
 					agendaClientes.add(clienteNuevo);
 					//creo una boleta y la agrego al AList de Boletas de Prestamos
 					BoletaPrestamo boletaNueva = creaBoletaNueva(capitalizeEachWord(tituloBuscado),capitalizeEachWord(nombreCliente));
@@ -198,13 +218,13 @@ public class VideoStore {
 	//recibe datos de un cliente por Scanner y devuelve un Cliente nuevo
 	private static Cliente creaClienteNuevo() {
 		System.out.println("NUEVO CLIENTE");
-		System.out.printf("Nombre y apellid: ");
+		System.out.printf("Nombre y apellido: ");
 		String nombreClienteNuevo = scn.nextLine();
 		System.out.printf("Telefono: ");
-		String telClienteNuevoString = scn.nextLine();
+		String telClienteNuevo = scn.nextLine();
 		System.out.printf("Dirección: ");
 		String direcClienteNuevo = scn.nextLine();
-		Cliente clienteNuevo = new Cliente(nombreClienteNuevo,telClienteNuevoString,direcClienteNuevo);
+		Cliente clienteNuevo = new Cliente(capitalizeEachWord(nombreClienteNuevo),telClienteNuevo,capitalizeEachWord(direcClienteNuevo),0);
 		return clienteNuevo;
 	}
 	
@@ -227,6 +247,42 @@ public class VideoStore {
 			}
 		}
 		System.out.println("DEVOLUCIONES TOTALES DEL DIA: "+devoluciones);
+	}
+	
+	//muestra por cmd los ultimos 3 alquileres de un cliente -- el argumento ya se recibe "capitalizado"
+	private static void verUltimosAlquileresPorCliente(String cliente) {
+		if(checkClienteExistente(cliente)) { //chequeo q el cliente este en mi agenda
+			Cliente clienteAmostrar = buscarClientePorNombre(cliente); //obtengo el Cliente (obj)
+			System.out.println("\n[ALQUILERES DE : "+cliente.toUpperCase()+"]");
+			if(clienteAmostrar.getCantAlquileres() > 3) { //si ha hecho mas de 3 alquileres => muestro los ultimos 3
+				int i;
+				int mostrados=0;
+				for(i=boletasPrestamo.size()-1 ; i>0 ; i--) {
+					if(mostrados < 3 && boletasPrestamo.get(i).getNombreCliente().equals(cliente)) {
+						System.out.println("--------------------------------------");
+						System.out.println(boletasPrestamo.get(i).toString());
+						System.out.println("--------------------------------------");
+						mostrados++;
+					}
+				}
+			}else { //si ha hecho 3 alquileres o menos => nuestro todos
+				for(BoletaPrestamo b : boletasPrestamo) {
+					if(b.getNombreCliente().equals(cliente))
+						System.out.println(b.toString());
+				}
+			}
+		}else { //si el cliente no esta en mi agenda => no tengo nada para mostrar
+			System.out.println("El cliente ingresado no existe en la agenda del VideoStore");
+		}
+	}
+	
+	//busca un cliente por su nombre en la agenda de Clientes y devuelve todo el objeto Cliente
+	private static Cliente buscarClientePorNombre(String nombreClienteBuscado) {
+		Cliente clienteBuscado = null;
+		for(Cliente c : agendaClientes) {
+			if(c.getNombre().equals(nombreClienteBuscado)) clienteBuscado = c;
+		}
+		return clienteBuscado;
 	}
 	
 	//OTROS MEOTODOS AUXILIARES ---------------------------------------------------------------------------------------------------------------------------

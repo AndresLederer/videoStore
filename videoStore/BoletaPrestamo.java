@@ -55,7 +55,6 @@ public class BoletaPrestamo {
 	
 	//metodos
 	
-	
 	//@Override de .toString()
 	@Override
 	public String toString() {

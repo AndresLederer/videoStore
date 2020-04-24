@@ -5,6 +5,7 @@ public class Cliente {
 	private String nombre;
 	private String telefono;
 	private String direccion;
+	private int cantAlquileres;
 	
 	//setters
 	public void setNombre(String nombre) {
@@ -15,6 +16,9 @@ public class Cliente {
 	}
 	public void setDireccion(String direccion) {
 		this.direccion = direccion;
+	}
+	public void setCantAlquileres(int cantAlquileres) {
+		this.cantAlquileres = cantAlquileres;
 	}
 	
 	//getters
@@ -27,12 +31,16 @@ public class Cliente {
 	public String getDireccion() {
 		return direccion;
 	}
+	public int getCantAlquileres() {
+		return cantAlquileres;
+	}
 	
 	//constructor
-	public Cliente (String nombre,String telefono,String direccion) {
+	public Cliente (String nombre,String telefono,String direccion,int cantAlquileres) {
 		setNombre(nombre);
 		setTelefono(telefono);
 		setDireccion(direccion);
+		setCantAlquileres(cantAlquileres);
 	}
 	
 	//metodos
@@ -42,7 +50,7 @@ public class Cliente {
 	
 	@Override
 	public String toString() {
-		String rta = String.format("Cliente: %s\nTelefono: %s\nDirección: %s\n",getNombre(),getTelefono(),getDireccion());
+		String rta = String.format("Cliente: %s\nTelefono: %s\nDirección: %s\nAlquileres totales: %d\n",getNombre(),getTelefono(),getDireccion(),getCantAlquileres());
 		return rta;
 	}
 }
