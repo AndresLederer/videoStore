@@ -22,6 +22,7 @@ public class VideoStore {
 		Pelicula p4 = new Pelicula("Narnia",90,"Aventura",2012,"Estados Unidos","La aventura de cuatro hermanos en un mundo fantástico","PG-17",1,1);
 		Pelicula p5 = new Pelicula("Nemo",100,"Aventura",2008,"Estados Unidos","La aventura de Merlín buscando a su hijo a través de todo el oceáno","G",5,5);
 		Pelicula p6 = new Pelicula("Silence",96,"Terror",2018,"United Kingdom","El silencio se apodera del mundo. Aquel que hable se autosentencia a un final oscuro","UNRATED",3,3);
+		Pelicula p7 = new Pelicula("Yumanji",110,"Aventura",2005,"Estados Unidos","Yumanji no es solo un juego de mesa. Anímate a jugar, pero... bajo tu propio riesgo","PG-13",5,5);
 		//instancio libreria de peliculas 
 		libreriaPeliculas = new ArrayList <Pelicula>();
 		//cargo peliculas a la libreria
@@ -31,6 +32,7 @@ public class VideoStore {
 		libreriaPeliculas.add(p4);
 		libreriaPeliculas.add(p5);
 		libreriaPeliculas.add(p6);
+		libreriaPeliculas.add(p7);
 		
 		//instancio Clientes
 		Cliente c1 = new Cliente("Jael Stainer","+20 112 457852","Ganzngen Street 17",0);
@@ -67,7 +69,7 @@ public class VideoStore {
 					System.out.println("[2] Ver devoluciones del día"); //muestra las devoluciones de la fecha actual
 					System.out.println("[3] Ver alquileres vigentes"); //muestra los alquileres aun vigentes
 					System.out.println("[4] Ver últimos 3 alquileres por cliente"); //muestra los ultimos 3 alquileres de un cliente
-					System.out.println("[5] Ver top 3 películas más alquiladas"); //muestra el top 3 de las pelis mas alquiladas
+					System.out.println("[5] Ver top 3 de películas más alquiladas"); //muestra el top 3 de las pelis mas alquiladas
 					System.out.println("[6] Ver descripción de "); //muestra descripcion de una pelicula
 					System.out.println("[7] Ver películas por género"); //muestra todas las peliculas de un genero, ordenadas  por popularidad
 					System.out.println("[0] Salir"); //finaliza el programa
@@ -97,6 +99,9 @@ public class VideoStore {
 					String cliente = scn.nextLine();
 					verUltimosAlquileresPorCliente(capitalizeEachWord(cliente));
 					break;
+				case 5:
+					
+					break;
 				case 6:
 					scn = new Scanner(System.in);
 					System.out.println("Indique el titulo de la película: ");
@@ -113,10 +118,11 @@ public class VideoStore {
 					if(checkPeliculasDeGenero(capitalizeEachWord(genero))) {
 						System.out.println("[PELICULAS DE "+genero.toUpperCase()+"]");
 						for(Pelicula p : libreriaPeliculas) {
-							if(p.getGenero().equals(capitalizeEachWord(genero)))
+							if(p.getGenero().equals(capitalizeEachWord(genero))) {
 								System.out.println("--------------------------------------");
-							System.out.println(p.toString());
-							System.out.println("--------------------------------------");
+								System.out.println(p.toString());
+								System.out.println("--------------------------------------");
+							}
 						}
 					}else {
 						System.out.println("No hay peliculas de \""+genero.toUpperCase()+"\" en la libreria del VideoStore");
