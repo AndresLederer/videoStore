@@ -20,6 +20,8 @@ public class VideoStore {
 		Pelicula p2 = new Pelicula("Harry Potter 1",120,"Acción",2002,"Estados Unidos","La historia del niño que vivió","PG-13",8,8);
 		Pelicula p3 = new Pelicula("Planet Earth",110,"Documental",2016,"United Kingdom","Un detallado documental de la BBC sobre la crisis climática","G",12,12);
 		Pelicula p4 = new Pelicula("Narnia",90,"Aventura",2012,"Estados Unidos","La aventura de cuatro hermanos en un mundo fantástico","PG-17",1,1);
+		Pelicula p5 = new Pelicula("Nemo",100,"Aventura",2008,"Estados Unidos","La aventura de Merlín buscando a su hijo a través de todo el oceáno","G",5,5);
+		Pelicula p6 = new Pelicula("Silence",96,"Terror",2018,"United Kingdom","El silencio se apodera del mundo. Aquel que hable se autosentencia a un final oscuro","UNRATED",3,3);
 		//instancio libreria de peliculas 
 		libreriaPeliculas = new ArrayList <Pelicula>();
 		//cargo peliculas a la libreria
@@ -27,6 +29,8 @@ public class VideoStore {
 		libreriaPeliculas.add(p2);
 		libreriaPeliculas.add(p3);
 		libreriaPeliculas.add(p4);
+		libreriaPeliculas.add(p5);
+		libreriaPeliculas.add(p6);
 		
 		//instancio Clientes
 		Cliente c1 = new Cliente("Jael Stainer","+20 112 457852","Ganzngen Street 17",0);
@@ -44,62 +48,86 @@ public class VideoStore {
 		//instancio arraylist de boletas
 		boletasPrestamo = new ArrayList <BoletaPrestamo>();
 		
-		//menu principal del programa
-		try {
-			mainMenu();
-		}catch(InputMismatchException ex) {
-			System.out.println(">>> DEBE INGRESAR UN NUMERO ENTERO <<<");
-			mainMenu();
-		}
-		
-		
+		//menu principal del programa  
+		mainMenu();
 	}
 	
 	// METODOS ------------------------------------------------------------------------------------------------------------------------------------
 	
-	//mainMenu -- concidero una InputMismatchException si se ingresa un String en lungar de un int
+	//mainMenu -- concidero throws InputMismatchException por si se ingresa un String en lungar de un int
 	private static void mainMenu() throws InputMismatchException {
 		scn = new Scanner(System.in);
 		int opcion;
-		do {
+		try { //intento ejecutar el programa
 			do {
-//				clearConsole();
-				System.out.println(formatoPers.format(actualDate));
-				System.out.println("<<< VIDEO STORE >>>\n\n");
-				System.out.println("[1] Alquilar pelicula");
-				System.out.println("[2] Devoluciones del día");
-				System.out.println("[3] Alquileres vigentes");
-				System.out.println("[4] Ultimos 3 alquileres por cliente");
-				System.out.println("[0] Salir");
-				System.out.printf("\n\nIndique una opción: "); 
-				opcion = scn.nextInt();
-			} while(opcion < 0 || opcion > 4);
-			switch(opcion) {
-			case 0:
-				System.out.println("Ha finalizado la ejecución");
-				System.exit(0);
-				break;
-			case 1:
-				if(alquilarPelicula()) 
-					System.out.println("Pelicula alquilada");
-				else
-					System.out.println("Pelicula no alquilada");
-				break;
-			case 2:
-				verDevolucionesDelDia();
-				break;
-			case 3:
-				verAlquileresVigentes();
-				break;
-			case 4:
-				scn = new Scanner(System.in);
-				System.out.printf("Indique el nombre completo del cliente: ");
-//				scn.nextLine(); //acomoda cursor del Scanner
-				String cliente = scn.nextLine();
-				verUltimosAlquileresPorCliente(capitalizeEachWord(cliente));
-				break;
-			}
-		} while(opcion != 0);
+				do {
+					System.out.println(formatoPers.format(actualDate));
+					System.out.println("<<< VIDEO STORE >>>\n\n");
+					System.out.println("[1] Alquilar pelicula"); //alquila una pelicula
+					System.out.println("[2] Ver devoluciones del día"); //muestra las devoluciones de la fecha actual
+					System.out.println("[3] Ver alquileres vigentes"); //muestra los alquileres aun vigentes
+					System.out.println("[4] Ver últimos 3 alquileres por cliente"); //muestra los ultimos 3 alquileres de un cliente
+					System.out.println("[5] Ver top 3 películas más alquiladas"); //muestra el top 3 de las pelis mas alquiladas
+					System.out.println("[6] Ver descripción de "); //muestra descripcion de una pelicula
+					System.out.println("[7] Ver películas por género"); //muestra todas las peliculas de un genero, ordenadas  por popularidad
+					System.out.println("[0] Salir"); //finaliza el programa
+					System.out.printf("\n\nIndique una opción: "); 
+					opcion = scn.nextInt();
+				} while(opcion < 0 || opcion > 7);
+				switch(opcion) {
+				case 0:
+					System.out.println("Ha finalizado la ejecución del programa");
+					System.exit(0);
+					break;
+				case 1:
+					if(alquilarPelicula()) 
+						System.out.println("Pelicula alquilada");
+					else
+						System.out.println("Pelicula no alquilada");
+					break;
+				case 2:
+					verDevolucionesDelDia();
+					break;
+				case 3:
+					verAlquileresVigentes();
+					break;
+				case 4:
+					scn = new Scanner(System.in);
+					System.out.printf("Indique el nombre completo del cliente: ");
+					String cliente = scn.nextLine();
+					verUltimosAlquileresPorCliente(capitalizeEachWord(cliente));
+					break;
+				case 6:
+					scn = new Scanner(System.in);
+					System.out.println("Indique el titulo de la película: ");
+					String pelicula = scn.nextLine();
+					if(buscarPeliculaPorNombre(capitalizeEachWord(pelicula)))
+						verDescripcionPelicula(capitalizeEachWord(pelicula));
+					else
+						System.out.println("La pelicula ingresada no existe en la libreria del VideoStore");
+					break;
+				case 7:
+					scn = new Scanner(System.in);
+					System.out.printf("Indique un género: ");
+					String genero = scn.nextLine();
+					if(checkPeliculasDeGenero(capitalizeEachWord(genero))) {
+						System.out.println("[PELICULAS DE "+genero.toUpperCase()+"]");
+						for(Pelicula p : libreriaPeliculas) {
+							if(p.getGenero().equals(capitalizeEachWord(genero)))
+								System.out.println("--------------------------------------");
+							System.out.println(p.toString());
+							System.out.println("--------------------------------------");
+						}
+					}else {
+						System.out.println("No hay peliculas de \""+genero.toUpperCase()+"\" en la libreria del VideoStore");
+					}
+					break;
+				}
+			} while(opcion != 0);
+		}catch(InputMismatchException ex) { //si en scn recibo un String en lugar de un int => advierto con un mensaje por cmd y recursión al método
+			System.out.println(">>> DEBE INGRESAR UN NUMERO ENTERO <<<");
+			mainMenu();
+		}
 	}
 	
 //	//corrobora que una pelicula este en la libreriaPeliculas
@@ -110,6 +138,28 @@ public class VideoStore {
 //		}
 //		return existe;
 //	}
+	
+	//corrobora que haya peliculas de un determinado genero en la libreria del VideoStore
+	private static boolean checkPeliculasDeGenero(String genero) {
+		boolean hayPelis = false;
+		for(Pelicula p : libreriaPeliculas) {
+			if(p.getGenero().equals(genero) && hayPelis == false)
+				hayPelis = true;
+		}
+		return hayPelis;
+	}
+	
+	//muestra la descripcion de una pelicula -- recibe el nombre por parametro
+	private static void verDescripcionPelicula(String pelicula) {
+		for(Pelicula p : libreriaPeliculas) {
+			if(p.getTitulo().contentEquals(pelicula)) {
+				System.out.println("[DESCRIPCION DE "+pelicula.toUpperCase()+"]");
+				System.out.println("--------------------------------------");
+				System.out.println(p.getDescripcion());
+				System.out.println("--------------------------------------");
+			}
+		}
+	}
 	
 	//busca pelicula por nombre -- devuelve true si esta en la libreria, de lo contrario devuelve false
 	private static boolean buscarPeliculaPorNombre(String tituloBuscado) {
@@ -253,7 +303,7 @@ public class VideoStore {
 	private static void verUltimosAlquileresPorCliente(String cliente) {
 		if(checkClienteExistente(cliente)) { //chequeo q el cliente este en mi agenda
 			Cliente clienteAmostrar = buscarClientePorNombre(cliente); //obtengo el Cliente (obj)
-			System.out.println("\n[ALQUILERES DE : "+cliente.toUpperCase()+"]");
+			System.out.println("\n[ULTIMOS 3 ALQUILERES DE : "+cliente.toUpperCase()+"]");
 			if(clienteAmostrar.getCantAlquileres() > 3) { //si ha hecho mas de 3 alquileres => muestro los ultimos 3
 				int i;
 				int mostrados=0;
@@ -265,11 +315,15 @@ public class VideoStore {
 						mostrados++;
 					}
 				}
-			}else { //si ha hecho 3 alquileres o menos => nuestro todos
+			}else if(clienteAmostrar.getCantAlquileres() > 0){ //si ha hecho 3 alquileres o menos => nuestro todos
 				for(BoletaPrestamo b : boletasPrestamo) {
 					if(b.getNombreCliente().equals(cliente))
+						System.out.println("--------------------------------------");
 						System.out.println(b.toString());
+						System.out.println("--------------------------------------");
 				}
+			}else {
+				System.out.println("El cliente ingresado no tienen ningún alquiler registrado");
 			}
 		}else { //si el cliente no esta en mi agenda => no tengo nada para mostrar
 			System.out.println("El cliente ingresado no existe en la agenda del VideoStore");
