@@ -51,7 +51,12 @@ public class VideoStore {
 		boletasPrestamo = new ArrayList <BoletaPrestamo>();
 		
 		//menu principal del programa  
-		mainMenu();
+		try {
+			mainMenu();
+		}catch (InputMismatchException ex) {
+			System.out.println(">>>>> DEBE INGRESAR UN NUMERO ENTERO <<<<<");
+			main(args);
+		}
 	}
 	
 	// METODOS ------------------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +65,7 @@ public class VideoStore {
 	private static void mainMenu() throws InputMismatchException {
 		scn = new Scanner(System.in);
 		int opcion;
-		try { //intento ejecutar el programa
+//		try { //intento ejecutar el programa
 			do {
 				do {
 					System.out.println(formatoPers.format(actualDate));
@@ -130,10 +135,10 @@ public class VideoStore {
 					break;
 				}
 			} while(opcion != 0);
-		}catch(InputMismatchException ex) { //si en scn recibo un String en lugar de un int => advierto con un mensaje por cmd y recursión al método
-			System.out.println(">>> DEBE INGRESAR UN NUMERO ENTERO <<<");
-			mainMenu();
-		}
+//		}catch(InputMismatchException ex) { //si en scn recibo un String en lugar de un int => advierto con un mensaje por cmd y recursión al método
+//			System.out.println(">>> DEBE INGRESAR UN NUMERO ENTERO <<<");
+//			mainMenu();
+//		}
 	}
 	
 //	//corrobora que una pelicula este en la libreriaPeliculas
